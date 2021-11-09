@@ -6,3 +6,28 @@
 .App > div {
   margin-right: 50px;
 }
+
+button{
+  cursor: pointer;
+  border: none;
+  padding: 5px;
+  margin: 0 10px;
+}
+.todolist{
+  padding: 10px;
+  border: 1px solid teal;
+}
+
+
+.activeButton{
+  background-color: teal;
+  border: none;
+}
+
+.completedTask{
+  opacity: 0.5;
+}
+
+.errorText{
+  color: red;
+}
