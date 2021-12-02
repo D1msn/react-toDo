@@ -1,6 +1,14 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  font-family: Roboto;
+}
+
 .App {
-  padding: 30px;
-  display: flex;
+  /*padding: 30px;*/
 }
 
 .App > div {
@@ -14,8 +22,22 @@ button{
   margin: 0 10px;
 }
 .todolist{
+  min-width: 400px;
   padding: 10px;
-  border: 1px solid teal;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #00000033;
+}
+.todolist ul{
+  width: 100%;
+  flex-grow: 1;
+}
+.todolist ul li{
+  display: flex;
+  align-items: center;
+}
+.todolist ul li p{
+  flex-grow: 1;
 }
 
 
@@ -25,7 +47,7 @@ button{
 }
 
 .completedTask{
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .errorText{

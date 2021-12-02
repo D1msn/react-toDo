@@ -1,4 +1,6 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
+import {IconButton, TextField} from "@material-ui/core";
+import {AddBoxOutlined} from "@material-ui/icons";
 
 
 type PropsType = {
@@ -34,15 +36,19 @@ const AddItemForm = (props: PropsType) => {
 	}
 
 	return (
-		<div>
-			<input
+		<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+			<TextField
 				className={error ? "error" : ""}
 				value={inputValue}
 				onKeyDown={EnterHandler}
 				onChange={inputValueHandler}
-				placeholder={"Введите название:"}/>
-			{inputValue.length > 0 && <button onClick={setTitle}>+</button>}
-			{error && <div className="errorText">Field is required</div>}
+				label="Введите название:"
+				style={{ marginBottom: 10, width: "calc(100% - 65px)" }}
+				error={error}
+			/>
+			<IconButton onClick={setTitle} color={"primary"} style={{ padding: 5 }}>
+				<AddBoxOutlined/>
+			</IconButton>
 		</div>
 	);
 }

@@ -1,8 +1,34 @@
-import React, {useState} from 'react';
+import React, {useReducer} from 'react';
 import './App.css';
 import TodoList from "./components/TodoList";
 import {v1} from "uuid";
 import AddItemForm from "./components/AddItemForm";
+import {
+	createTheme,
+	MuiThemeProvider,
+	AppBar,
+	IconButton,
+	Typography,
+	Button,
+	Toolbar,
+	Container, Grid
+} from "@material-ui/core";
+import {Menu} from "@material-ui/icons";
+import {
+	AddTodoListAC,
+	ChangeTodoListFilterAC,
+	ChangeTodoListTitleAC,
+	removeTodoListAC,
+	todolistReducer
+} from "./store/todolist-reducer";
+import {
+	AddTaskListAC,
+	ChangeTaskStatusAC,
+	ChangeTaskTitleAC,
+	CreateTaskAC,
+	RemoveTaskAC, RemoveTaskListAC,
+	tasksReducer
+} from "./store/tasks-reducer";
 
 export type TaskType = {
 	id: string
@@ -10,20 +36,32 @@ export type TaskType = {
 	isDone: boolean
 }
 
-type TodoListType = {
+export type TodoListType = {
 	id: string
 	title: string
 	filter: FilterValuesType
 
 }
 
-type TasksStateType = {
+export type TasksStateType = {
 	[key: string]: Array<TaskType>
 }
 
 export type FilterValuesType = "all" | "active" | "completed"
 
 function App() {
+
+	const theme = createTheme({
+		palette: {
+			primary: {
+				main: "#2ca58c",
+			},
+			secondary: {
+				main: '#b71818',
+
+			},
+		},
+	});
 
 	// const todoListID_1 = v1();
 	// const todoListID_2 = v1();
@@ -47,50 +85,42 @@ function App() {
 		],
 	}
 
-	const [todos, setTodos] = useState<Array<TodoListType>>(todoLists)
-	const [taskList, setTaskList] = useState(tasks);
+	const [todos, todosDispatch] = useReducer(todolistReducer,todoLists)
+	const [taskList, taskListDispatcher] = useReducer(tasksReducer, tasks);
 
 	const addTodoList = (title: string) => {
+		debugger
 		const idTaskList = v1()
-		setTodos([...todos, {id: idTaskList, title: title, filter: 'all'}])
-		setTaskList({...taskList, [idTaskList]: []})
+		todosDispatch(AddTodoListAC(title, idTaskList))
+		taskListDispatcher(AddTaskListAC(idTaskList))
 	}
-
 
 	const removeTask = (taskID: string, todoListID: string) => {
-		taskList[todoListID] = taskList[todoListID].filter(task => task.id !== taskID)
-		setTaskList({...taskList})
+		taskListDispatcher(RemoveTaskAC(taskID, todoListID))
 	}
+
 	const createTask = (title: string, todoListID: string) => {
-		let newTaskList: TaskType = {
-			id: v1(),
-			title: title,
-			isDone: false
-		}
-		setTaskList({...taskList, [todoListID]: [newTaskList, ...taskList[todoListID]]})
+		taskListDispatcher(CreateTaskAC(title, todoListID))
 	}
+
 	const changeTaskStatus = (taskID: string, isDone: boolean, todoListID: string) => {
-		setTaskList({
-			...taskList,
-			[todoListID]: taskList[todoListID].map(t => t.id === taskID ? {...t, isDone: isDone} : t)
-		});
+		taskListDispatcher(ChangeTaskStatusAC(taskID,isDone,todoListID))
 	}
+
 	const changeTaskTitle = (taskID: string, title: string, todoListID: string) => {
-		setTaskList({
-			...taskList,
-			[todoListID]: taskList[todoListID].map(t => t.id === taskID ? {...t, title} : t)
-		});
+		taskListDispatcher(ChangeTaskTitleAC(taskID,title,todoListID))
 	}
 
 	const changeFilter = (filter: FilterValuesType, todoListID: string) => {
-		setTodos(todos.map(tl => tl.id === todoListID ? {...tl, filter: filter} : tl))
+		todosDispatch(ChangeTodoListFilterAC(filter, todoListID))
 	}
 
 	const changeTodoListTitle = (title: string, todoListID: string) => {
-		setTodos(todos.map(tl => tl.id === todoListID ? {...tl, title} : tl))
+		todosDispatch(ChangeTodoListTitleAC(title, todoListID))
 	}
 	const removeTodoList = (todoListID: string) => {
-		setTodos(todos.filter(tl => tl.id !== todoListID))
+		taskListDispatcher(RemoveTaskListAC(todoListID))
+		todosDispatch(removeTodoListAC(todoListID))
 	}
 
 	const todoListsComponents = todos.map(tl => {
@@ -103,31 +133,56 @@ function App() {
 			tasksForRender = taskList[tl.id].filter(item => item.isDone)
 		}
 
-		return <TodoList
-				key={tl.id}
-				id={tl.id}
-				filter={tl.filter}
-				title={tl.title}
-				tasks={tasksForRender}
-				removeTask={removeTask}
-				createTask={createTask}
-				changeFilter={changeFilter}
-				changeTaskStatus={changeTaskStatus}
-				removeTodoList={removeTodoList}
-				changeTaskTitle={changeTaskTitle}
-				changeTodoListTitle={changeTodoListTitle}
-		/>
+		return (
+			<Grid container item xs={3}
+				  key={tl.id}>
+				<TodoList
+					id={tl.id}
+					filter={tl.filter}
+					title={tl.title}
+					tasks={tasksForRender}
+					removeTask={removeTask}
+					createTask={createTask}
+					changeFilter={changeFilter}
+					changeTaskStatus={changeTaskStatus}
+					removeTodoList={removeTodoList}
+					changeTaskTitle={changeTaskTitle}
+					changeTodoListTitle={changeTodoListTitle}
+				/>
+			</Grid>
+			)
+
+
 	})
 
 
-
-
 	return (
-		<div className="App">
-			<AddItemForm addItem={addTodoList}/>
-			{todoListsComponents}
-		</div>
-	);
+		<MuiThemeProvider theme={theme}>
+			<div className="App">
+				<AppBar position="sticky">
+					<Toolbar style={{justifyContent: "space-between"}}>
+						<IconButton edge="start" color="inherit" aria-label="menu">
+							<Menu/>
+						</IconButton>
+						<Typography variant="h6">
+							Todolists
+						</Typography>
+						<Button color="inherit" variant={"outlined"}>Login</Button>
+					</Toolbar>
+				</AppBar>
+				<Container maxWidth={false} fixed>
+					<Grid container style={{ margin: "20px 0" }}>
+						<AddItemForm addItem={addTodoList}/>
+					</Grid>
+					<Grid container spacing={5} >
+						{todoListsComponents}
+					</Grid>
+				</Container>
+			</div>
+		</MuiThemeProvider>
+
+	)
+		;
 }
 
 export default App;

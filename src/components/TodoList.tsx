@@ -1,8 +1,9 @@
-import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
+import React, {ChangeEvent} from 'react';
 import {FilterValuesType, TaskType} from "../App";
-import {v1} from "uuid";
 import AddItemForm from './AddItemForm';
 import EditableSpan from "./EditableSpan";
+import {Button, ButtonGroup, Checkbox, IconButton, List, ListItem, Paper} from "@material-ui/core";
+import {HighlightOff} from "@material-ui/icons";
 
 type PropsType = {
 	id: string
@@ -34,17 +35,18 @@ function TodoList(props: PropsType) {
 			props.changeTaskTitle (task.id , title, props.id)
 		}
 		return (
-			<li key={task.id} className={task.isDone ? "completedTask" : ""}>
-				<input
-					type="checkbox"
+			<ListItem key={task.id} className={task.isDone ? "completedTask" : ""} style={{ padding: 0 }}>
+				<Checkbox
+					size={"small"}
+					color={"primary"}
 					onChange={changeTaskStatus}
-					checked={task.isDone}/>
+					checked={task.isDone} />
+
 				<EditableSpan title={task.title} setNewTitle={changeTitle}/>
-				<button onClick={() => {
-					removeTask(task.id)
-				}}>X
-				</button>
-			</li>
+				<IconButton aria-label="share" onClick={() => {removeTask(task.id)}} >
+					<HighlightOff style={{ width: "20px", height: "20px" }} color={"secondary"}/>
+				</IconButton>
+			</ListItem>
 		)
 	})
 
@@ -62,27 +64,32 @@ function TodoList(props: PropsType) {
 
 
 	return (
-		<div className={"todolist"}>
-			<h3><EditableSpan title={props.title} setNewTitle={changeTodolistTitle} /> <button onClick={()=> props.removeTodoList(props.id)}>X</button></h3>
+		<Paper className={"todolist"} variant="elevation" elevation={5}>
+				<span style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+					<EditableSpan title={props.title} setNewTitle={changeTodolistTitle}/>
+					<IconButton aria-label="share" onClick={() => props.removeTodoList(props.id)}>
+						<HighlightOff style={{width: "20px", height: "20px"}}  color={"secondary"}/>
+					</IconButton>
+				</span>
 			<AddItemForm addItem={addTask}/>
-			<ul>
+			<List disablePadding={true}>
 				{taskList}
-			</ul>
-			<div>
-				<button
-					className={props.filter === "all" ? "activeButton" : ""}
-					onClick={filterAll}>All
-				</button>
-				<button
-					className={props.filter === "active" ? "activeButton" : ""}
-					onClick={filterActive}>Active
-				</button>
-				<button
-					className={props.filter === "completed" ? "activeButton" : ""}
-					onClick={filterCompleted}>Completed
-				</button>
-			</div>
-		</div>
+			</List>
+				<ButtonGroup variant="text" color="primary" size={"small"} fullWidth>
+					<Button
+						variant={props.filter === "all" ? "contained" : "text"}
+						onClick={filterAll}>All
+					</Button>
+					<Button
+						variant={props.filter === "active" ? "contained" : "text"}
+						onClick={filterActive}>Active
+					</Button>
+					<Button
+						variant={props.filter === "completed" ? "contained" : "text"}
+						onClick={filterCompleted}>Completed
+					</Button>
+				</ButtonGroup>
+		</Paper>
 	);
 }
 
