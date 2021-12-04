@@ -5,9 +5,9 @@ import {
 	removeTodoListAC,
 	todoListActions,
 	todolistReducer
-} from './todolist-reducer';
+} from '../todolist-reducer';
 import {v1} from 'uuid';
-import {FilterValuesType, TodoListType} from '../App';
+import {FilterValuesType, TodoListType} from '../../../App';
 
 test('correct todolist should be removed', () => {
 	let todolistId1 = v1();

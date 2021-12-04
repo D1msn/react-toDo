@@ -1,5 +1,18 @@
-import {TasksStateType, TaskType} from "../App";
+import {TasksStateType, TaskType} from "../../App";
 import {v1} from "uuid";
+
+const initialState: TasksStateType = {
+	"334455": [{id: v1(), title: "1", isDone: false},
+		{id: v1(), title: "2", isDone: false},
+		{id: v1(), title: "3", isDone: true},
+		{id: v1(), title: "4", isDone: true}
+	],
+	"667788": [{id: v1(), title: "a", isDone: false},
+		{id: v1(), title: "s", isDone: false},
+		{id: v1(), title: "f", isDone: true},
+		{id: v1(), title: "d", isDone: true}
+	],
+}
 
 export enum TasksActions {
 	REMOVE_TASK_LIST = "REMOVE-TASK-LIST",
@@ -11,7 +24,7 @@ export enum TasksActions {
 }
 
 
-export const tasksReducer = (taskList: TasksStateType, action: TasksActionsTypes): TasksStateType => {
+export const tasksReducer = (taskList = initialState, action: TasksActionsTypes): TasksStateType => {
 	switch (action.type) {
 
 		case TasksActions.REMOVE_TASK_LIST:
